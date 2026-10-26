@@ -134,13 +134,21 @@ def build(data, out_png, out_pdf):
     Fv = next(c for c in range(160, 40, -1)
               if vfits(data, c, avail_top, avail_bot)[0])
     # 2) la família més ampla que encara hi cap horitzontalment sense perdre mida
+    F = None
+    millor = None          # (mida, família) de reserva, si cap talla arriba al 90%
     for fam in ("sofia-semi.ttf", "sofia-cond.ttf", "sofia.ttf"):
         SOFIA = fam
         cand = next((c for c in range(Fv, 40, -1)
                      if fits(d, data, c, avail_top, avail_bot)[0]), 0)
+        if millor is None or cand > millor[0]:
+            millor = (cand, fam)
         if cand >= Fv * 0.90:
             F = cand
             break
+    if F is None:
+        # cap talla no hi cap a la mida vertical màxima (poques files i noms llargs):
+        # agafem la talla que permet la mida més gran
+        F, SOFIA = millor[0], millor[1]
     used = vfits(data, F, avail_top, avail_bot)[1]
     print("família:", SOFIA, " Fv:", Fv)
     m = metrics(F)
