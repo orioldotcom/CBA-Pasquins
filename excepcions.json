@@ -1,0 +1,12 @@
+{
+  "_comentari": "Files destacades que s'afegeixen al pasqui d'una setmana concreta. La clau es el dilluns de la setmana (ISO). Cada entrada s'insereix al dia indicat, en ordre cronologic segons 'hora'. Les setmanes que no surten aqui es generen normal, aixi que aixo caduca sol.",
+  "2026-11-23": [
+    {
+      "data": "2026-11-28",
+      "tipus": "event",
+      "hora": "19.00h",
+      "titol": "PRESENTACIÓ D'EQUIPS",
+      "subtitol": "TEMPORADA 2026-2027"
+    }
+  ]
+}

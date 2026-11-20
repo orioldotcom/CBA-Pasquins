@@ -134,7 +134,7 @@ def setmana(offset=0):
         mes, prep = MESOS[d.month - 1]
         titol = f"{DAYS[d.weekday()]} {d.day} {prep}{'' if prep.endswith(chr(39)) else ' '}{mes}"
         if actual is None or actual['titol'] != titol:
-            actual = {'titol': titol, 'partits': []}
+            actual = {'data': d.isoformat(), 'titol': titol, 'partits': []}
             dies.append(actual)
         etiqueta = g[8] if len(g) > 8 and g[8] else level_label(g)
         estat = {2: 'AJORNAT', 3: 'SUSPÈS'}.get(int(g[6] or 0), '')

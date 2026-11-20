@@ -113,8 +113,13 @@ def fits(d, data, F, avail_top, avail_bot):
     right = W - RXM
     for day in data["dies"]:
         for p in day["partits"]:
-            wln = (tw(d, p["nostre"], f_t) + tw(d, "–", f_s)
-                   + tw(d, p["rival"], f_s) + m["f_match"] * 0.7)
+            if p.get("tipus") == "event":
+                f_sub = sofia(int(m["f_match"] * 0.80), 500)
+                wln = (tw(d, p["titol"], f_t) + tw(d, "–", f_sub)
+                       + tw(d, p.get("subtitol", ""), f_sub) + m["f_match"] * 1.3)
+            else:
+                wln = (tw(d, p["nostre"], f_t) + tw(d, "–", f_s)
+                       + tw(d, p["rival"], f_s) + m["f_match"] * 0.7)
             if team_x + wln > right:
                 return False, None
     n_rows = sum(len(x["partits"]) for x in data["dies"])
@@ -197,6 +202,24 @@ def build(data, out_png, out_pdf):
         d.text((W / 2 - tw(d, day["titol"], f_day) / 2, y), day["titol"], font=f_day, fill=GREY)
         y += m["day_h"] + extra
         for i, p in enumerate(day["partits"]):
+            if p.get("tipus") == "event":
+                # fila destacada (presentacions, actes del club): franja vermella plena
+                pad = m["f_match"] * 0.30
+                box = [LX - pad, y - pad * 0.80, W - RXM, y + m["row_h"] + pad * 0.15]
+                d.rounded_rectangle(box, radius=int(m["f_match"] * 0.22), fill=RED)
+                asc, desc = f_t.getmetrics()
+                base = (box[1] + box[3]) / 2 + (asc - desc) / 2   # text centrat a la franja
+                f_sub = sofia(int(m["f_match"] * 0.80), 500)
+                d.text((LX, base), p["hora"], font=f_t, fill=WHITE, anchor="ls")
+                x = TEAM_X
+                d.text((x, base), p["titol"], font=f_t, fill=WHITE, anchor="ls")
+                if p.get("subtitol"):
+                    x += tw(d, p["titol"], f_t) + m["f_match"] * 0.30
+                    d.text((x, base), "–", font=f_sub, fill=FOOT_PINK, anchor="ls")
+                    x += tw(d, "–", f_sub) + m["f_match"] * 0.30
+                    d.text((x, base), p["subtitol"], font=f_sub, fill=FOOT_PINK, anchor="ls")
+                y = y + m["row_h"] + m["row_gap"] + extra
+                continue
             d.text((LX, y), p["hora"], font=f_t, fill=RED)
             x = TEAM_X
             d.text((x, y), p["nostre"], font=f_t, fill=DARK)
@@ -206,7 +229,8 @@ def build(data, out_png, out_pdf):
             d.text((x, y), p["rival"], font=f_s, fill=THEM)
             draw_ls(d, (TEAM_X + 4, y + m["row_info_dy"]), p["lliga"], f_i, GREY, m["f_info"] * 0.07)
             rb = y + m["row_h"]
-            if i < len(day["partits"]) - 1:
+            if (i < len(day["partits"]) - 1
+                    and day["partits"][i + 1].get("tipus") != "event"):
                 d.rectangle([LX, rb, W - RXM, rb + 2], fill=LINE)
             y = rb + m["row_gap"] + extra
         if dn < len(data["dies"]) - 1:
